@@ -15,6 +15,7 @@ builder.Services.AddPersistence(builder.Configuration);
 
 //CUANDO NO SON GENÉRICOS:
 //builder.Services.AddScoped<IReportService, ReportService>();
+//Prueba Commit
 
 builder.Services.AddScoped(typeof(IReportService<>), typeof(ReportService<>));
 
