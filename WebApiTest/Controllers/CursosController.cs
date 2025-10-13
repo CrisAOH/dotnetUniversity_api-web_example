@@ -32,6 +32,7 @@ namespace WebApiTest.Controllers
         [HttpGet("[action]")]
         public async Task<IActionResult> ReporteCSV(CancellationToken cancellationToken)
         {
+            //
             CursoReporteExcelQueryRequest query = new CursoReporteExcelQueryRequest();
             MemoryStream resultado = await _sender.Send(query, cancellationToken);
             byte[] excelBytes = resultado.ToArray();
