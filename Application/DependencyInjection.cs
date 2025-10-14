@@ -1,3 +1,6 @@
+using Application.Core;
+using Application.Cursos.CursoCreate;
+using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Application
@@ -10,6 +13,8 @@ namespace Application
             {
                 configuration.RegisterServicesFromAssembly(typeof(DependencyInjection).Assembly);
             });
+
+            services.AddValidatorsFromAssemblyContaining<CursoCreateCommand>();
 
             return services;
         }

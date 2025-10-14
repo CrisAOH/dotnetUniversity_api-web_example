@@ -6,8 +6,8 @@ namespace Application.Cursos.CursoCreate
     {
         public CursoCreateValidator()
         {
-            RuleFor(x => x.Titulo);
-            RuleFor(x => x.Descripcion);
+            RuleFor(x => x.Titulo).NotEmpty().WithMessage("El título no debe ser vacío.");
+            RuleFor(x => x.Descripcion).NotEmpty().WithMessage("La descripción no debe ser vacía.");
         }
     }
 }

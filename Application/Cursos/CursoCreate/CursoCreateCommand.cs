@@ -3,6 +3,7 @@
 
 using Application.Core;
 using Domain;
+using FluentValidation;
 using MediatR;
 using Persistence;
 
@@ -40,6 +41,14 @@ namespace Application.Cursos.CursoCreate
                 bool resultado = await _context.SaveChangesAsync(cancellationToken) > 0;
 
                 return resultado ? Result<Guid>.Success(curso.ID) : Result<Guid>.Failure("No se pudo insertar el curso.");
+            }
+        }
+
+        public class CursoCreateCommandRequestValidator : AbstractValidator<CursoCreateCommandRequest>
+        {
+            public CursoCreateCommandRequestValidator()
+            {
+                RuleFor(x => x.cursoCreateRequest).SetValidator(new CursoCreateValidator());
             }
         }
     }
