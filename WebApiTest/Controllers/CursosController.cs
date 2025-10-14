@@ -5,12 +5,14 @@ using System.Threading.Tasks;
 using Application.Core;
 using Application.Cursos.CursoCreate;
 using Application.Cursos.GetCurso;
+using Application.Cursos.GetCursos;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using static Application.Cursos.CursoCreate.CursoCreateCommand;
 using static Application.Cursos.CursoReporteExcel.CursoReporteExcelQuery;
 using static Application.Cursos.GetCurso.GetCursoQuery;
+using static Application.Cursos.GetCursos.GetCursosQuery;
 
 namespace WebApiTest.Controllers
 {
@@ -18,17 +20,31 @@ namespace WebApiTest.Controllers
     [Route("[controller]")]
     public class CursosController : ControllerBase
     {
-        private readonly ISender _sender;
+        private readonly ISender                        _sender;
         private readonly IValidator<CursoCreateRequest> _validator;
 
         public CursosController(ISender sender, IValidator<CursoCreateRequest> validator)
         {
-            _sender = sender;
+            _sender    = sender;
             _validator = validator;
         }
 
+        [HttpGet("[action]")]
+        public async Task<ActionResult> GetCursos([FromQuery] GetCursosRequest request,
+                                                  CancellationToken            cancellationToken)
+        {
+            var query = new GetCursosQueryRequest
+            {
+                CursosRequest = request
+            };
+            var resultado = await _sender.Send(query, cancellationToken);
+
+            return resultado.IsSuccess ? Ok(resultado.Value) : NotFound();
+        }
+
         [HttpPost("[action]")]
-        public async Task<ActionResult<Result<Guid>>> CursoCreate([FromForm] CursoCreateRequest request, CancellationToken cancellationToken)
+        public async Task<ActionResult<Result<Guid>>> CursoCreate(
+            [FromForm] CursoCreateRequest request, CancellationToken cancellationToken)
         {
             var result = await _validator.ValidateAsync(request, cancellationToken);
 
@@ -56,9 +72,9 @@ namespace WebApiTest.Controllers
         public async Task<IActionResult> ReporteCSV(CancellationToken cancellationToken)
         {
             //
-            CursoReporteExcelQueryRequest query = new CursoReporteExcelQueryRequest();
-            MemoryStream resultado = await _sender.Send(query, cancellationToken);
-            byte[] excelBytes = resultado.ToArray();
+            CursoReporteExcelQueryRequest query      = new CursoReporteExcelQueryRequest();
+            MemoryStream                  resultado  = await _sender.Send(query, cancellationToken);
+            byte[]                        excelBytes = resultado.ToArray();
 
             return File(excelBytes, "text/csv", "cursos.csv");
         }
