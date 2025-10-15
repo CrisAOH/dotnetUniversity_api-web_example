@@ -6,7 +6,7 @@ namespace Infrastructure.Fotos
     public class FotoService : IFotoService
     {
         private readonly string _uploadsFolder;
-        private readonly long _maxBytes = 5 * 1024 * 1024;
+        private readonly long   _maxBytes = 5 * 1024 * 1024;
 
         public FotoService(string uploadsFolder)
         {
@@ -15,13 +15,14 @@ namespace Infrastructure.Fotos
 
         private static readonly Dictionary<string, string> ContentTypeToExt = new()
         {
-            {"image/jpeg", ".jpg"},
-            {"image/jpg", ".jpg"},
-            {"image/png", ".png"},
-            {"image/webp", ".webp"}
+            { "image/jpeg", ".jpg" },
+            { "image/jpg", ".jpg" },
+            { "image/png", ".png" },
+            { "image/webp", ".webp" }
         };
 
-        public async Task<FotoUploadResult> AddFoto(Stream fotoStream, string? fotoNombre, string? fotoContentType)
+        public async Task<FotoUploadResult> AddFoto(Stream  fotoStream, string? fotoNombre,
+                                                    string? fotoContentType)
         {
             if (fotoStream == null)
             {
@@ -38,7 +39,8 @@ namespace Infrastructure.Fotos
                 throw new Exception($"El archivo excede el tamaño máximo de {_maxBytes} bytes");
             }
 
-            if (!ContentTypeToExt.TryGetValue(fotoContentType?.ToLowerInvariant() ?? string.Empty, out string? ext))
+            if (!ContentTypeToExt.TryGetValue(fotoContentType?.ToLowerInvariant() ?? string.Empty,
+                                              out string? ext))
             {
                 throw new Exception("Tipo de contenido no permitido.");
             }
@@ -51,16 +53,17 @@ namespace Infrastructure.Fotos
                 }
 
                 // Generar nombre seguro (GUID + extensión)
-                var publicId = Guid.NewGuid().ToString("N");
+                var publicId     = Guid.NewGuid().ToString("N");
                 var safeFileName = publicId + ext;
-                var filePath = Path.Combine(_uploadsFolder, safeFileName);
+                var filePath     = Path.Combine(_uploadsFolder, safeFileName);
 
                 if (fotoStream.CanSeek)
                 {
                     fotoStream.Position = 0;
                 }
 
-                using (var fs = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None, 81920, useAsync: true))
+                using (var fs = new FileStream(filePath, FileMode.Create, FileAccess.Write,
+                                               FileShare.None, 81920, useAsync: true))
                 {
                     await fotoStream.CopyToAsync(fs);
                 }
@@ -72,21 +75,21 @@ namespace Infrastructure.Fotos
 
                 return new FotoUploadResult
                 {
-                    Url = publicUrl,
-                    PublicId = publicId,
-                    FileName = safeFileName,
-                    Size = fileInfo.Length,
+                    Url         = publicUrl,
+                    PublicId    = publicId,
+                    FileName    = safeFileName,
+                    Size        = fileInfo.Length,
                     ContentType = fotoContentType
                 };
             }
             catch (Exception e)
             {
-
+                Console.WriteLine($"Ha ocurrido un error: {e.Message}");
                 throw;
             }
         }
 
-        public async Task<string> DeleteFoto(string publicID)
+        public string DeleteFoto(string publicID)
         {
             if (string.IsNullOrEmpty(publicID))
             {
@@ -112,7 +115,6 @@ namespace Infrastructure.Fotos
             }
             catch (Exception e)
             {
-
                 return $"Error al eliminar la foto: {e.Message}";
             }
         }

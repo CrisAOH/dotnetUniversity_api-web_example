@@ -4,10 +4,10 @@ namespace Application.Interfaces
 {
     public interface IFotoService
     {
-        Task<FotoUploadResult> AddFoto(Stream fotoStream,
-        string? fotoNombre,
-        string? fotoContentType);
+        Task<FotoUploadResult> AddFoto(Stream  fotoStream,
+                                       string? fotoNombre,
+                                       string? fotoContentType);
 
-        Task<string> DeleteFoto(string publicID);
+        string DeleteFoto(string publicID);
     }
 }
