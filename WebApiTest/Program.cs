@@ -1,5 +1,7 @@
+using System.IO;
 using Application;
 using Application.Interfaces;
+using Infrastructure.Fotos;
 using Infrastructure.Reports;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,6 +12,8 @@ using WebApiTest.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var uploadsPath = Path.Combine(builder.Environment.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot"), "uploads");
+
 builder.Services.AddApplication();
 builder.Services.AddPersistence(builder.Configuration);
 
@@ -19,6 +23,7 @@ builder.Services.AddPersistence(builder.Configuration);
 //Prueba Commit 2
 
 builder.Services.AddScoped(typeof(IReportService<>), typeof(ReportService<>));
+builder.Services.AddSingleton<IFotoService>(new FotoService(uploadsPath));
 
 builder.Services.AddControllers();
 

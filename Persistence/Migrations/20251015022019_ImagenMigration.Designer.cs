@@ -11,8 +11,8 @@ using Persistence;
 namespace Persistence.Migrations
 {
     [DbContext(typeof(ApisWebDbContext))]
-    [Migration("20251012231915_MigracionInicial")]
-    partial class MigracionInicial
+    [Migration("20251015022019_ImagenMigration")]
+    partial class ImagenMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -101,7 +101,10 @@ namespace Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid>("CursoID")
+                    b.Property<Guid?>("CursoID")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PublicID")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Url")
@@ -408,8 +411,7 @@ namespace Persistence.Migrations
                     b.HasOne("Domain.Curso", "Curso")
                         .WithMany("Fotos")
                         .HasForeignKey("CursoID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Curso");
                 });

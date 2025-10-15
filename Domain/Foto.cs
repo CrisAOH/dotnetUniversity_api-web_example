@@ -8,5 +8,7 @@ namespace Domain
         public string? Url { get; set; }
 
         public Curso? Curso { get; set; }
+
+        public string? PublicID { get; set; }
     }
 }

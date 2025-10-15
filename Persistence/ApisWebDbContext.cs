@@ -55,7 +55,6 @@ namespace Persistence
                 .HasMany(m => m.Fotos)
                 .WithOne(m => m.Curso)
                 .HasForeignKey(m => m.CursoID)
-                .IsRequired()
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Curso>()

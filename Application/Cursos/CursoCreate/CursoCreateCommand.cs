@@ -2,6 +2,8 @@
 //CommandHandler
 
 using Application.Core;
+using Application.Imagenes;
+using Application.Interfaces;
 using Domain;
 using FluentValidation;
 using MediatR;
@@ -20,21 +22,42 @@ namespace Application.Cursos.CursoCreate
         internal class CursoCreateCommandHandler : IRequestHandler<CursoCreateCommandRequest, Result<Guid>>
         {
             private readonly ApisWebDbContext _context;
+            private readonly IFotoService _fotoService;
 
-            public CursoCreateCommandHandler(ApisWebDbContext context)
+            public CursoCreateCommandHandler(ApisWebDbContext context, IFotoService fotoService)
             {
                 _context = context;
+                _fotoService = fotoService;
             }
 
             public async Task<Result<Guid>> Handle(CursoCreateCommandRequest request, CancellationToken cancellationToken)
             {
+                var cursoID = Guid.NewGuid();
                 Curso curso = new Curso
                 {
-                    ID = Guid.NewGuid(),
+                    ID = cursoID,
                     Titulo = request.cursoCreateRequest.Titulo,
                     Descripcion = request.cursoCreateRequest.Descripcion,
                     FechaPublicacion = request.cursoCreateRequest.FechaPublicacion
                 };
+
+                if (request.cursoCreateRequest.FotoStream is not null)
+                {
+                    FotoUploadResult fotoUploadResult = await _fotoService.AddFoto(request.cursoCreateRequest.FotoStream, request.cursoCreateRequest.FotoNombre, request.cursoCreateRequest.FotoContentType);
+
+                    var foto = new Foto
+                    {
+                        ID = Guid.NewGuid(),
+                        Url = fotoUploadResult.Url,
+                        PublicID = fotoUploadResult.PublicId,
+                        CursoID = cursoID,
+                    };
+
+                    curso.Fotos = new List<Foto>
+                    {
+                        foto
+                    };
+                }
 
                 _context.Add(curso);
 

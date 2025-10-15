@@ -18,6 +18,7 @@ namespace Application.Core
         public static partial CursoResponse CursoToCursoResponse(this Curso curso);
 
         [MapProperty(nameof(Foto.Url), nameof(ImagenResponse.URL))]
+        [MapperIgnoreSource(nameof(Foto.PublicID))]
         [MapperIgnoreSource(nameof(Foto.Curso))]
         public static partial ImagenResponse MapToImagenResponse(this Foto foto);
 

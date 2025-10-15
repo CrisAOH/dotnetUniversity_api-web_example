@@ -98,7 +98,10 @@ namespace Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid>("CursoID")
+                    b.Property<Guid?>("CursoID")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PublicID")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Url")
@@ -405,8 +408,7 @@ namespace Persistence.Migrations
                     b.HasOne("Domain.Curso", "Curso")
                         .WithMany("Fotos")
                         .HasForeignKey("CursoID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Curso");
                 });
