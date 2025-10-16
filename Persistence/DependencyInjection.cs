@@ -20,6 +20,8 @@ namespace Persistence
 
                 opt
                 .UseSqlite(configuration.GetConnectionString("SQLite"))
+
+                //COMO EL NOMBRE INDICA, ESTO ES PARA LLENAR LAS TABLAS DE FORMA ASÍNCRONA. HAY QUE TENER CUIDADO CON VALORES CAMBIANTES PORQUE ESTO PUEDE CAUSAR ERROR, SE NECESITAN VALORES CONSTANTES
                 .UseAsyncSeeding(async (context, status, cancellationToken) =>
                 {
                     ApisWebDbContext apiWebDbContext = (ApisWebDbContext)context;
@@ -28,7 +30,6 @@ namespace Persistence
                     try
                     {
                         await SeedDatabase.SeedRolesAndUsersAsync(context, logger, cancellationToken);
-
                         await SeedDatabase.SeedPreciosAsync(apiWebDbContext, logger, cancellationToken);
                         await SeedDatabase.SeedInstructoresAsync(apiWebDbContext, logger, cancellationToken);
                         await SeedDatabase.SeedCursosAsync(apiWebDbContext, logger, cancellationToken);

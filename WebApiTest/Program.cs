@@ -4,9 +4,11 @@ using Application.Interfaces;
 using Infrastructure.Fotos;
 using Infrastructure.Reports;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Persistence;
+using Persistence.Models;
 using WebApiTest.Extensions;
 using WebApiTest.Middleware;
 
@@ -32,7 +34,11 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
 //PARA AÑADIR CONTROLADORES
-
+builder.Services.AddIdentityCore<AppUser>(opt =>
+{
+    opt.Password.RequireNonAlphanumeric = false;
+    opt.User.RequireUniqueEmail = true;
+}).AddRoles<IdentityRole>().AddEntityFrameworkStores<ApisWebDbContext>();
 
 var app = builder.Build();
 app.UseMiddleware<ExceptionMiddleware>();

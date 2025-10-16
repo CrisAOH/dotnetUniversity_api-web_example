@@ -28,11 +28,12 @@ namespace Application.Cursos.GetCursos
 
             public async Task<Result<PaginatedList<CursoResponse>>> Handle(
                 GetCursosQueryRequest request,
-                CancellationToken     cancellationToken)
+                CancellationToken cancellationToken)
             {
                 IQueryable<Curso> queryable = _context.Cursos!.Include(x => x.Instructores)
                                                       .Include(x => x.Calificaciones)
-                                                      .Include(x => x.Precios);
+                                                      .Include(x => x.Precios)
+                                                      .Include(x => x.Fotos);
 
                 Expression<Func<Curso, bool>> predicate = ExpressionBuilder.New<Curso>();
                 if (!string.IsNullOrEmpty(request.CursosRequest!.Titulo))
@@ -54,9 +55,9 @@ namespace Application.Cursos.GetCursos
                     Expression<Func<Curso, object>> orderBySelector =
                         request.CursosRequest.OrderBy!.ToLower() switch
                         {
-                            "titulo"      => curso => curso.Titulo!,
+                            "titulo" => curso => curso.Titulo!,
                             "descripcion" => curso => curso.Descripcion!,
-                            _             => curso => curso.Titulo!
+                            _ => curso => curso.Titulo!
                         };
 
                     bool orderBy = request.CursosRequest.OrderAsc.HasValue

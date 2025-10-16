@@ -1,5 +1,7 @@
-﻿using System.Threading;
+﻿using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
+using Application.Core;
 using Application.Precios.GetPrecios;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -19,8 +21,9 @@ namespace WebApiTest.Controllers
         }
 
         [HttpGet("[action]")]
-        public async Task<ActionResult> GetPrecios([FromQuery] GetPreciosRequest request,
-                                                   CancellationToken             cancellationToken)
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        public async Task<ActionResult<PaginatedList<PrecioResponse>>> GetPrecios([FromQuery] GetPreciosRequest request,
+                                                   CancellationToken cancellationToken)
         {
             var query = new GetPreciosQueryRequest()
             {

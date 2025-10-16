@@ -30,6 +30,10 @@ namespace Application.Cursos.GetCurso
             public async Task<Result<CursoResponse>> Handle(GetCursoQueryRequest request, CancellationToken cancellationToken)
             {
                 var curso = await _context.Cursos!.Where(x => x.ID == request.ID)
+                .Include(x => x.Instructores)
+                .Include(x => x.Precios)
+                .Include(x => x.Calificaciones)
+                .Include(x => x.Fotos)
                 .ProjectToCursoResponse()
                 .FirstOrDefaultAsync();
 

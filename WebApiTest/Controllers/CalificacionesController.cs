@@ -1,6 +1,8 @@
-﻿using System.Threading;
+﻿using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using Application.Calificaciones.GetCalificaciones;
+using Application.Core;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using static Application.Calificaciones.GetCalificaciones.GetCalificacionesQuery;
@@ -19,7 +21,8 @@ namespace WebApiTest.Controllers
         }
 
         [HttpGet("[action]")]
-        public async Task<ActionResult> GetCalificaciones(
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        public async Task<ActionResult<PaginatedList<CalificacionResponse>>> GetCalificaciones(
             [FromQuery] GetCalificacionesRequest request, CancellationToken cancellationToken)
         {
             var query = new GetCalificacionesQueryRequest()

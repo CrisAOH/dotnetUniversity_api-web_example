@@ -11,8 +11,8 @@ using Persistence;
 namespace Persistence.Migrations
 {
     [DbContext(typeof(ApisWebDbContext))]
-    [Migration("20251015022019_ImagenMigration")]
-    partial class ImagenMigration
+    [Migration("20251016055542_UsersMigration")]
+    partial class UsersMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

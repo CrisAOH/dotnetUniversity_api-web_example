@@ -1,5 +1,7 @@
-﻿using System.Threading;
+﻿using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
+using Application.Core;
 using Application.Instructores.GetInstructores;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -19,7 +21,8 @@ namespace WebApiTest.Controllers
         }
 
         [HttpGet("[action]")]
-        public async Task<ActionResult> GetInstructores([FromQuery] GetInstructoresRequest request,
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        public async Task<ActionResult<PaginatedList<InstructorResponse>>> GetInstructores([FromQuery] GetInstructoresRequest request,
                                                         CancellationToken cancellationToken)
         {
             var query = new GetInstructoresQueryRequest
