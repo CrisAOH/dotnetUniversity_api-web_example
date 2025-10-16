@@ -19,17 +19,18 @@ using static Application.Cursos.GetCursos.GetCursosQuery;
 using static Application.Cursos.CursoUpdate.CursoUpdateCommand;
 using static Application.Cursos.CursoDelete.CursoDeleteCommand;
 using System.Net;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WebApiTest.Controllers
 {
     [ApiController]
+    //[Authorize] ES MÁS RECOMENDABLE QUE CADA ENDPOINT TENGA SU AUTHORIZE.
     [Route("[controller]")]
     public class CursosController : ControllerBase
     {
         private readonly ISender _sender;
         private readonly IValidator<CursoCreateRequest> _validator;
         private readonly IValidator<CursoUpdateRequest> _validatorUpdate;
-
 
 
         public CursosController(ISender sender, IValidator<CursoCreateRequest> validator,
@@ -40,10 +41,12 @@ namespace WebApiTest.Controllers
             _validatorUpdate = validatorUpdate;
         }
 
+        [AllowAnonymous]
         [HttpGet("[action]")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
-        public async Task<ActionResult<PaginatedList<CursoResponse>>> GetCursos([FromQuery] GetCursosRequest request,
-                                                  CancellationToken cancellationToken)
+        public async Task<ActionResult<PaginatedList<CursoResponse>>> GetCursos(
+            [FromQuery] GetCursosRequest request,
+            CancellationToken cancellationToken)
         {
             var query = new GetCursosQueryRequest
             {
@@ -55,6 +58,7 @@ namespace WebApiTest.Controllers
         }
 
         //CursoCreateForm es un modelo auxiliar para permitir el uso de IFormFile, ya que CursoCreateRequest en Application no tiene acceso a este tipo de dato.
+        [Authorize(Policy = PolicyMaster.CURSO_WRITE)]
         [HttpPost("[action]")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         public async Task<ActionResult<Result<Guid>>> CursoCreate(
@@ -90,6 +94,7 @@ namespace WebApiTest.Controllers
             return resultado.IsSuccess ? Ok(resultado.Value) : BadRequest();
         }
 
+        [Authorize(Policy = PolicyMaster.CURSO_UPDATE)]
         [HttpPut("[action]/{id}")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         public async Task<ActionResult<Result<Guid>>> CursoUpdate(
@@ -107,9 +112,11 @@ namespace WebApiTest.Controllers
             return resultado.IsSuccess ? Ok(resultado.Value) : BadRequest();
         }
 
+        [Authorize(Policy = PolicyMaster.CURSO_DELETE)]
         [HttpDelete("[action]/{id}")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
-        public async Task<ActionResult<Unit>> CursoDelete(Guid id, CancellationToken cancellationToken)
+        public async Task<ActionResult<Unit>> CursoDelete(
+            Guid id, CancellationToken cancellationToken)
         {
             var command = new CursoDeleteCommandRequest(id);
             var resultado = await _sender.Send(command, cancellationToken);
@@ -118,7 +125,8 @@ namespace WebApiTest.Controllers
 
         [HttpGet("[action]/{id}")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
-        public async Task<ActionResult<CursoResponse>> GetCurso(Guid ID, CancellationToken cancellationToken)
+        public async Task<ActionResult<CursoResponse>> GetCurso(
+            Guid ID, CancellationToken cancellationToken)
         {
             GetCursoQueryRequest query = new GetCursoQueryRequest { ID = ID };
 
@@ -126,6 +134,7 @@ namespace WebApiTest.Controllers
 
             return result.IsSuccess ? Ok(result.Value) : BadRequest();
         }
+
 
         [HttpGet("[action]")]
         public async Task<IActionResult> ReporteCSV(CancellationToken cancellationToken)

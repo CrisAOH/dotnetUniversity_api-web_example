@@ -14,10 +14,13 @@ using WebApiTest.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var uploadsPath = Path.Combine(builder.Environment.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot"), "uploads");
+var uploadsPath = Path.Combine(builder.Environment.WebRootPath ??
+                               Path.Combine(Directory.GetCurrentDirectory(), "wwwroot"), "uploads");
 
 builder.Services.AddApplication();
 builder.Services.AddPersistence(builder.Configuration);
+builder.Services.AddIdentityServices(builder.Configuration);
+builder.Services.AddPoliciesServices();
 
 //CUANDO NO SON GENÉRICOS:
 //builder.Services.AddScoped<IReportService, ReportService>();
@@ -26,19 +29,14 @@ builder.Services.AddPersistence(builder.Configuration);
 
 builder.Services.AddScoped(typeof(IReportService<>), typeof(ReportService<>));
 builder.Services.AddSingleton<IFotoService>(new FotoService(uploadsPath));
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddControllers();
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
-
-//PARA AÑADIR CONTROLADORES
-builder.Services.AddIdentityCore<AppUser>(opt =>
-{
-    opt.Password.RequireNonAlphanumeric = false;
-    opt.User.RequireUniqueEmail = true;
-}).AddRoles<IdentityRole>().AddEntityFrameworkStores<ApisWebDbContext>();
+//builder.Services.AddOpenApi();
+builder.Services.AddSwaggerDocumentation();
 
 var app = builder.Build();
 app.UseMiddleware<ExceptionMiddleware>();
@@ -46,8 +44,11 @@ app.UseMiddleware<ExceptionMiddleware>();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwaggerDocumentation();
 }
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 await app.SeedDataAuthentication();
 //PARA QUE FUNCIONEN LAS URIs
