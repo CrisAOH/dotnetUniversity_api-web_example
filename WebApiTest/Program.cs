@@ -37,6 +37,10 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 //builder.Services.AddOpenApi();
 builder.Services.AddSwaggerDocumentation();
+builder.Services.AddCors(o => o.AddPolicy("corsapp", builder =>
+{
+    builder.WithOrigins("*").AllowAnyMethod().AllowAnyHeader();
+}));
 
 var app = builder.Build();
 app.UseMiddleware<ExceptionMiddleware>();
@@ -49,6 +53,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseCors("corsapp");
 
 await app.SeedDataAuthentication();
 //PARA QUE FUNCIONEN LAS URIs

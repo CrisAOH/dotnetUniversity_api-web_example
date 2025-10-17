@@ -10,7 +10,7 @@ namespace Application.Cursos.CursoUpdate
     {
         public record CursoUpdateCommandRequest(
             CursoUpdateRequest cursoUpdateRequest,
-            Guid?              CursoId) : IRequest<Result<Guid>>;
+            Guid? CursoId) : IRequest<Result<Guid>>, ICommandBase;
 
         internal class CursoUpdateCommandHandler :
             IRequestHandler<CursoUpdateCommandRequest, Result<Guid>>
@@ -23,18 +23,18 @@ namespace Application.Cursos.CursoUpdate
             }
 
             public async Task<Result<Guid>> Handle(CursoUpdateCommandRequest request,
-                                                   CancellationToken         cancellationToken)
+                                                   CancellationToken cancellationToken)
             {
                 var cursoID = request.CursoId;
-                var curso   = await _context.Cursos!.FirstOrDefaultAsync(x => x.ID == cursoID);
+                var curso = await _context.Cursos!.FirstOrDefaultAsync(x => x.ID == cursoID);
 
                 if (curso is null)
                 {
                     return Result<Guid>.Failure("El curso no existe.");
                 }
 
-                curso.Descripcion      = request.cursoUpdateRequest.Descripcion;
-                curso.Titulo           = request.cursoUpdateRequest.Titulo;
+                curso.Descripcion = request.cursoUpdateRequest.Descripcion;
+                curso.Titulo = request.cursoUpdateRequest.Titulo;
                 curso.FechaPublicacion = request.cursoUpdateRequest.FechaPublicacion;
 
                 _context.Entry(curso).State = EntityState.Modified;

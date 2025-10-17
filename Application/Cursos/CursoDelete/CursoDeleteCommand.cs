@@ -9,7 +9,7 @@ namespace Application.Cursos.CursoDelete
     public class CursoDeleteCommand
     {
         public record CursoDeleteCommandRequest(
-            Guid? CursoId) : IRequest<Result<Unit>>;
+            Guid? CursoId) : IRequest<Result<Unit>>, ICommandBase;
 
         internal class CursoDeleteCommandHandler :
             IRequestHandler<CursoDeleteCommandRequest, Result<Unit>>

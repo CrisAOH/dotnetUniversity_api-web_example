@@ -9,8 +9,22 @@ namespace Application.Cursos.CursoUpdate
             RuleFor(x => x.Titulo).NotEmpty().WithMessage("El título no debe estar vacío.");
             RuleFor(x => x.Descripcion).NotEmpty()
                                        .WithMessage("La descripción no debe estar vacía.");
-            RuleFor(x => x.FechaPublicacion).NotEmpty()
-                                            .WithMessage("La fecha de publicación no debe ser vacía.");
+            RuleFor(x => x.FechaPublicacion).Must(ValidateDateTime).WithMessage("Error en la fecha de publicación.");
+        }
+
+        private bool ValidateDateTime(DateTime? date)
+        {
+            if (date == null)
+            {
+                return false;
+            }
+
+            if (date == default(DateTime))
+            {
+                return false;
+            }
+
+            return true;
         }
     }
 }

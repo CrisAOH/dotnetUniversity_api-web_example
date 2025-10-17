@@ -1,5 +1,6 @@
 ﻿using Application.Core;
 using Application.Interfaces;
+using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -10,7 +11,7 @@ namespace Application.Accounts.Register
     public class RegisterCommand
     {
         public record RegisterCommandRequest(
-            RegisterRequest RegisterRequest) : IRequest<Result<Profile>>;
+            RegisterRequest RegisterRequest) : IRequest<Result<Profile>>, ICommandBase;
 
         internal class RegisterCommandHandler :
             IRequestHandler<RegisterCommandRequest, Result<Profile>>
@@ -54,6 +55,8 @@ namespace Application.Accounts.Register
 
                 if (resultado.Succeeded)
                 {
+                    await _userManager.AddToRoleAsync(user, "Client");
+
                     var profile = new Profile
                     {
                         Email = user.Email,
@@ -64,8 +67,16 @@ namespace Application.Accounts.Register
 
                     return Result<Profile>.Success(profile);
                 }
-                
+
                 return Result<Profile>.Failure("Ocurrió un error al registrar al usuario.");
+            }
+        }
+
+        public class RegisterCommandRequestValidator : AbstractValidator<RegisterCommandRequest>
+        {
+            public RegisterCommandRequestValidator()
+            {
+                RuleFor(x => x.RegisterRequest).SetValidator(new RegisterValidator());
             }
         }
     }

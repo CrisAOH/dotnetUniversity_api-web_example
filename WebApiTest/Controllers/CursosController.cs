@@ -29,16 +29,10 @@ namespace WebApiTest.Controllers
     public class CursosController : ControllerBase
     {
         private readonly ISender _sender;
-        private readonly IValidator<CursoCreateRequest> _validator;
-        private readonly IValidator<CursoUpdateRequest> _validatorUpdate;
 
-
-        public CursosController(ISender sender, IValidator<CursoCreateRequest> validator,
-                                IValidator<CursoUpdateRequest> validatorUpdate)
+        public CursosController(ISender sender)
         {
             _sender = sender;
-            _validator = validator;
-            _validatorUpdate = validatorUpdate;
         }
 
         [AllowAnonymous]
@@ -80,13 +74,6 @@ namespace WebApiTest.Controllers
                 request.FotoContentType = form.Foto.ContentType;
             }
 
-            var result = await _validator.ValidateAsync(request, cancellationToken);
-
-            if (!result.IsValid)
-            {
-                return BadRequest(result.Errors);
-            }
-
             CursoCreateCommandRequest command = new CursoCreateCommandRequest(request);
 
             var resultado = await _sender.Send(command, cancellationToken);
@@ -100,12 +87,6 @@ namespace WebApiTest.Controllers
         public async Task<ActionResult<Result<Guid>>> CursoUpdate(
             [FromBody] CursoUpdateRequest request, Guid id, CancellationToken cancellationToken)
         {
-            var validacion = await _validatorUpdate.ValidateAsync(request, cancellationToken);
-
-            if (!validacion.IsValid)
-            {
-                return BadRequest(validacion.Errors);
-            }
 
             var command = new CursoUpdateCommandRequest(request, id);
             var resultado = await _sender.Send(command, cancellationToken);

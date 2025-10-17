@@ -16,7 +16,7 @@ namespace Application.Cursos.CursoCreate
     {
         //Los records son más útiles cuando sólo se quiere guardar datos en memoria
         public record CursoCreateCommandRequest(
-            CursoCreateRequest cursoCreateRequest) : IRequest<Result<Guid>>
+            CursoCreateRequest cursoCreateRequest) : IRequest<Result<Guid>>, ICommandBase
         {
         }
 
@@ -24,23 +24,23 @@ namespace Application.Cursos.CursoCreate
             IRequestHandler<CursoCreateCommandRequest, Result<Guid>>
         {
             private readonly ApisWebDbContext _context;
-            private readonly IFotoService     _fotoService;
+            private readonly IFotoService _fotoService;
 
             public CursoCreateCommandHandler(ApisWebDbContext context, IFotoService fotoService)
             {
-                _context     = context;
+                _context = context;
                 _fotoService = fotoService;
             }
 
             public async Task<Result<Guid>> Handle(CursoCreateCommandRequest request,
-                                                   CancellationToken         cancellationToken)
+                                                   CancellationToken cancellationToken)
             {
                 var cursoID = Guid.NewGuid();
                 Curso curso = new Curso
                 {
-                    ID               = cursoID,
-                    Titulo           = request.cursoCreateRequest.Titulo,
-                    Descripcion      = request.cursoCreateRequest.Descripcion,
+                    ID = cursoID,
+                    Titulo = request.cursoCreateRequest.Titulo,
+                    Descripcion = request.cursoCreateRequest.Descripcion,
                     FechaPublicacion = request.cursoCreateRequest.FechaPublicacion
                 };
 
@@ -53,10 +53,10 @@ namespace Application.Cursos.CursoCreate
 
                     var foto = new Foto
                     {
-                        ID       = Guid.NewGuid(),
-                        Url      = fotoUploadResult.Url,
+                        ID = Guid.NewGuid(),
+                        Url = fotoUploadResult.Url,
                         PublicID = fotoUploadResult.PublicId,
-                        CursoID  = cursoID,
+                        CursoID = cursoID,
                     };
 
                     curso.Fotos = new List<Foto>
